@@ -1,0 +1,28 @@
+from surprise import Dataset, Reader
+from surprise.model_selection import cross_validate
+from surprise import SVD
+from surprise import accuracy
+
+# Create a reader object to read the data
+reader = Reader(rating_scale=(0, 1))
+
+# Load the data from a file
+data = Dataset.load_from_file('spotify_data.csv', reader=reader)
+
+# Use the SVD algorithm
+algo = SVD()
+
+# Run 5-fold cross-validation and print results
+cross_validate(algo, data, measures=['RMSE', 'MAE'], cv=5, verbose=True)
+
+# Train the algorithm on the dataset and test it on the testset
+trainset = data.build_full_trainset()
+algo.train(trainset)
+
+# Predict the rating for a user and an item
+uid = str(1)  # user id
+iid = str(101)  # item id
+pred = algo.predict(uid, iid, r_ui=1, verbose=True)
+
+# Print the predicted rating
+print('The predicted rating for user', uid, 'and item', iid, 'is', pred.est)
